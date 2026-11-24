@@ -1,6 +1,6 @@
 // Service worker: sitedeki tüm dosyaları önbelleğe alır; önce önbellek, yoksa ağ.
 // CACHE_VERSION ve DOSYALAR `node tools/sw_guncelle.mjs` ile güncellenir.
-const CACHE_VERSION = 'nk-2026-11-24-3';
+const CACHE_VERSION = 'nk-2026-11-24-4';
 const DOSYALAR = [
   './',
   'index.html',
