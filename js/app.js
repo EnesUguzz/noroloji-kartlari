@@ -1,6 +1,7 @@
 // Uygulama çatısı: ilerleme durumu, kayıt ve hash ile ekran geçişi (#ana, #calis, #test, #ayarlar).
 import bolumler from '../data/index.js';
 import { loadProgress, saveProgress } from './kayit.js';
+import { bugun } from './tarih.js';
 import * as ana from './ui/ana.js';
 import * as calis from './ui/calis.js';
 import * as test from './ui/test.js';
@@ -16,6 +17,7 @@ const bosDepo = { getItem: () => null, setItem: () => { throw new Error('depo yo
 let ilerleme = loadProgress(depo() || bosDepo);
 let kayitHatasi = false;
 let temizle = null;
+let cizilenGun = null; // ana ekranın en son çizildiği gün
 
 // Bir ekrandan ötekine seçim taşımak için (ör. hangi kartlarla çalışılacağı).
 export const paylasim = {};
@@ -56,14 +58,27 @@ function ciz() {
   kok.innerHTML = '';
   kok.className = '';
   window.scrollTo(0, 0);
+  cizilenGun = bugun();
   temizle = ekran.goster(kok, app) || null;
 }
 
 window.addEventListener('hashchange', ciz);
 ciz();
 
+// iOS uygulamayı saatlerce askıda tutabilir: geri gelindiğinde gün değiştiyse ana ekranı yeniden çiz,
+// yeni sürüm olup olmadığına da bak.
+let swKaydi = null;
+function geriGelindi() {
+  if (document.visibilityState === 'hidden') return;
+  if ((location.hash || '#ana') === '#ana' && cizilenGun !== bugun()) ciz();
+  if (swKaydi) swKaydi.update().catch(() => {});
+}
+document.addEventListener('visibilitychange', geriGelindi);
+window.addEventListener('pageshow', geriGelindi);
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then((reg) => {
+    swKaydi = reg;
     const izle = (w) => {
       if (!w) return;
       const kontrol = () => {

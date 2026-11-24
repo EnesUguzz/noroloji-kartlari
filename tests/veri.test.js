@@ -58,3 +58,10 @@ test('sw DOSYALAR lists every site file', () => {
 test('SURUM equals CACHE_VERSION', () => {
   assert.equal(swBilgisi().surum, SURUM);
 });
+
+import { readFileSync } from 'node:fs';
+
+test('sw install bypasses the HTTP cache', () => {
+  const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  assert.match(sw, /cache:\s*'reload'/);
+});
