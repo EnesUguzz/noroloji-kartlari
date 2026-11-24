@@ -42,6 +42,37 @@ export function dogrula(bolum) {
   return h;
 }
 
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const KOK = join(dirname(fileURLToPath(import.meta.url)), '..');
+const SITE_KLASORLERI = ['css', 'fonts', 'icons', 'js', 'data'];
+const KOK_DOSYALARI = ['index.html', 'manifest.webmanifest'];
+
+// Sitede yayınlanan ve internetsiz çalışmak için önbelleğe girmesi gereken dosyalar (kök göreli, / ile).
+export function siteDosyalari(kok = KOK) {
+  const sonuc = [...KOK_DOSYALARI];
+  const gez = (goreli) => {
+    for (const ad of readdirSync(join(kok, goreli)).sort()) {
+      const g = goreli + '/' + ad;
+      if (statSync(join(kok, g)).isDirectory()) gez(g);
+      else if (!ad.endsWith('.txt')) sonuc.push(g);
+    }
+  };
+  for (const k of SITE_KLASORLERI) gez(k);
+  return sonuc;
+}
+
+// sw.js içindeki CACHE_VERSION ve DOSYALAR listesi.
+export function swBilgisi(kok = KOK) {
+  const metin = readFileSync(join(kok, 'sw.js'), 'utf8');
+  const surum = (metin.match(/CACHE_VERSION\s*=\s*'([^']+)'/) || [])[1];
+  const liste = (metin.match(/DOSYALAR\s*=\s*\[([\s\S]*?)\]/) || [])[1] || '';
+  const dosyalar = [...liste.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  return { surum, dosyalar };
+}
+
 import { pathToFileURL } from 'node:url';
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -54,5 +85,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     h.forEach((x) => console.log('  ' + x));
     hata += h.length;
   }
+  const { surum, dosyalar } = swBilgisi();
+  const { SURUM } = await import('../js/surum.js');
+  const eksik = siteDosyalari().filter((f) => !dosyalar.includes(f));
+  if (eksik.length) { console.log('sw.js DOSYALAR eksik: ' + eksik.join(', ')); hata++; }
+  if (surum !== SURUM) { console.log(`sw.js CACHE_VERSION (${surum}) ile js/surum.js SURUM (${SURUM}) farklı`); hata++; }
   process.exit(hata ? 1 : 0);
 }

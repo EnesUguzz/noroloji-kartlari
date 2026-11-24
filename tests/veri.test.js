@@ -43,3 +43,18 @@ test('vaka ratio not enforced for 10 or fewer questions', () => {
   b.sorular = b.sorular.slice(0, 10).map((q) => ({ ...q, tur: 'bilgi' }));
   assert.deepEqual(dogrula(b), []);
 });
+
+import { siteDosyalari, swBilgisi } from '../tools/veri_dogrula.mjs';
+import { SURUM } from '../js/surum.js';
+
+test('sw DOSYALAR lists every site file', () => {
+  const { dosyalar } = swBilgisi();
+  const eksik = siteDosyalari().filter((f) => !dosyalar.includes(f));
+  assert.deepEqual(eksik, []);
+  const fazla = dosyalar.filter((f) => f !== './' && !siteDosyalari().includes(f));
+  assert.deepEqual(fazla, []);
+});
+
+test('SURUM equals CACHE_VERSION', () => {
+  assert.equal(swBilgisi().surum, SURUM);
+});

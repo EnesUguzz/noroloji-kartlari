@@ -55,7 +55,7 @@ export function goster(kok, app) {
         </div>
         <button class="ikon-btn" type="button" id="ayarBtn" aria-label="Ayarlar ve yedek">${IKON.ayar}</button>
       </header>
-      <div id="guncelleme"></div>
+      ${app.guncellemeVar && app.guncellemeVar() ? '<div class="uyari bilgi" role="status">Yeni sürüm hazır. <button class="btn kucuk" type="button" id="yenileBtn">Yenile</button></div>' : ''}
       ${kayitHatasi ? `<div class="uyari hata" role="alert">Kayıt yapılamadı, yedek alın. <button class="btn kucuk" type="button" id="yedekBtn">Yedek</button></div>` : ''}
 
       <section class="ozet" aria-label="Bugün">
@@ -98,6 +98,7 @@ export function goster(kok, app) {
   const calis = (secim) => { app.paylasim.calis = secim; app.git('#calis'); };
 
   $('#ayarBtn').addEventListener('click', () => app.git('#ayarlar'));
+  $('#yenileBtn')?.addEventListener('click', () => app.guncelle());
   $('#yedekBtn')?.addEventListener('click', () => app.git('#ayarlar'));
   $('#bugunBtn').addEventListener('click', () => calis({ nolar: tumNolar, filtre: 'bugun', baslik: 'Bugün tekrar' }));
   $('#bilmiyorumBtn').addEventListener('click', () => calis({ nolar: tumNolar, filtre: 'bilmediklerim', baslik: 'Bilmediklerim' }));

@@ -36,7 +36,17 @@ export function git(hash) {
   else location.hash = hash;
 }
 
-const app = { durum, kaydet, git, paylasim };
+// Yeni sürüm: bekleyen service worker varsa ana ekranda "Yeni sürüm hazır" çubuğu çıkar.
+let bekleyenSW = null;
+let guncellemeIstendi = false;
+export function guncellemeVar() { return !!bekleyenSW; }
+export function guncelle() {
+  if (!bekleyenSW) return;
+  guncellemeIstendi = true;
+  bekleyenSW.postMessage('GUNCELLE');
+}
+
+const app = { durum, kaydet, git, paylasim, guncellemeVar, guncelle };
 
 function ciz() {
   if (temizle) { temizle(); temizle = null; }
@@ -51,3 +61,24 @@ function ciz() {
 
 window.addEventListener('hashchange', ciz);
 ciz();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    const izle = (w) => {
+      if (!w) return;
+      const kontrol = () => {
+        if (w.state === 'installed' && navigator.serviceWorker.controller) {
+          bekleyenSW = w;
+          if ((location.hash || '#ana') === '#ana') ciz();
+        }
+      };
+      w.addEventListener('statechange', kontrol);
+      kontrol();
+    };
+    izle(reg.waiting);
+    reg.addEventListener('updatefound', () => izle(reg.installing));
+  }).catch(() => { /* service worker yoksa uygulama yine çalışır */ });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (guncellemeIstendi) { guncellemeIstendi = false; location.reload(); }
+  });
+}
