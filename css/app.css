@@ -231,3 +231,35 @@ textarea {
 
 @media (max-height: 640px) { .calis { gap: 10px; } .hint { display: none; } }
 @media (prefers-reduced-motion: reduce) { .inner, .card-wrap.snap, .bar span { transition: none !important; } }
+
+/* Test ekranı */
+.soru { display: flex; flex-direction: column; gap: 14px; }
+.soru .chip { max-width: 100%; }
+.kok { margin: 0; font-size: 1.02rem; line-height: 1.55; font-weight: 500; }
+.siklar { display: flex; flex-direction: column; gap: 8px; }
+.sik {
+  display: flex; gap: 10px; align-items: flex-start; text-align: left; width: 100%;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 12px; min-height: 48px; line-height: 1.45;
+}
+.sik .harf {
+  flex: none; width: 26px; height: 26px; border-radius: 8px; background: var(--accent-soft); color: var(--accent);
+  font-family: var(--font-display); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; font-size: .85rem;
+}
+.sik:disabled { cursor: default; }
+.sik:disabled:not(.dogru):not(.yanlis) { opacity: .6; }
+.sik.dogru { border-color: var(--know); background: var(--know-soft); }
+.sik.dogru .harf { background: var(--know); color: var(--surface); }
+.sik.yanlis { border-color: var(--unknown); background: var(--unknown-soft); }
+.sik.yanlis .harf { background: var(--unknown); color: var(--surface); }
+#geri { display: flex; flex-direction: column; gap: 10px; }
+.geri-bildirim { border-radius: 12px; padding: 12px 14px; border-left: 4px solid; }
+.geri-bildirim.ok { background: var(--know-soft); border-color: var(--know); }
+.geri-bildirim.hata { background: var(--unknown-soft); border-color: var(--unknown); }
+.geri-bildirim strong { font-family: var(--font-display); }
+.geri-bildirim.ok strong { color: var(--know); }
+.geri-bildirim.hata strong { color: var(--unknown); }
+.geri-bildirim p { margin: 6px 0 0; font-size: .94rem; }
+.geri-bildirim .sayfa-no { font-weight: 600; color: var(--muted); font-size: .84rem; }
+.yanlis-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.yanlis-liste li { display: flex; gap: 10px; justify-content: space-between; font-size: .86rem; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.yanlis-liste em { font-style: normal; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
